@@ -17,7 +17,6 @@ async_sessionmaker_context: ContextVar[async_sessionmaker] = ContextVar(
 async def _run_callable(
     session: AsyncSession,
     async_callable,
-    nested=None,
     *args,
     **kwargs
 ):
@@ -36,7 +35,8 @@ def wrapper(async_callable, auto=True, nested=False):
     session_factory = async_sessionmaker_context.get()
     
     @functools.wraps(async_callable)
-    async def session_wrapper(auto=True, nested=False, *args, **kwargs):
+    async def session_wrapper(*args, **kwargs):
+
         existing_session = async_session_context.get()
 
         if nested == True and existing_session is None:
@@ -47,7 +47,6 @@ def wrapper(async_callable, auto=True, nested=False):
                 return await _run_callable(
                     existing_session,
                     async_callable,
-                    nested=nested,
                     *args,
                     **kwargs
                 )
@@ -57,7 +56,6 @@ def wrapper(async_callable, auto=True, nested=False):
                 return await _run_callable(
                     existing_session,
                     async_callable,
-                    nested=None,
                     *args,
                     **kwargs
                 )
@@ -66,7 +64,6 @@ def wrapper(async_callable, auto=True, nested=False):
                     return await _run_callable(
                         existing_session,
                         async_callable,
-                        nested=None,
                         *args,
                         **kwargs
                     )
@@ -76,7 +73,6 @@ def wrapper(async_callable, auto=True, nested=False):
                 return await _run_callable(
                     session,
                     async_callable,
-                    nested=None,
                     *args,
                     **kwargs
                 )
@@ -85,7 +81,6 @@ def wrapper(async_callable, auto=True, nested=False):
                     return await _run_callable(
                         session,
                         async_callable,
-                        nested=None,
                         *args,
                         **kwargs
                     )
