@@ -33,13 +33,9 @@ async def _run_callable(
 
     return result
 
-
-def with_async_session(async_callable, bind=False, nested=False):
-    # this function can either be used as an async generator or decorator for transaction or nested transaction
-    # for nested transaction, first parameter to the function should be True boolean value
-
+def wrapper(async_callable, bind, nested):
     session_factory = async_sessionmaker_context.get()
-
+    
     @functools.wraps(async_callable)
     async def session_wrapper(*args, **kwargs):
         existing_session = async_session_context.get()
@@ -81,3 +77,20 @@ def with_async_session(async_callable, bind=False, nested=False):
                 )
 
     return session_wrapper
+
+def with_async_session(*args, **kwargs):
+    # this function can either be used as an async generator or decorator for transaction or nested transaction
+    # for nested transaction, first parameter to the function should be True boolean value
+    if inspect.iscoroutinefunction(args[0]):
+        async_callable = args[0]
+        bind = False
+        nested = False
+        return wrapper(async_callable, bind, nested)
+    else:
+        bind = kwargs.get("bind", False)
+        nested = kwargs.get("nested", False)
+        def delayed_wrapper(async_callable):
+            return wrapper(async_callable, bind, nested)
+        return delayed_wrapper
+
+    
