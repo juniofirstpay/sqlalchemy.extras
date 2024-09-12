@@ -36,7 +36,7 @@ def wrapper(async_callable, auto=True, nested=False):
     session_factory = async_sessionmaker_context.get()
     
     @functools.wraps(async_callable)
-    async def session_wrapper(*args, **kwargs):
+    async def session_wrapper(auto=True, nested=False, *args, **kwargs):
         existing_session = async_session_context.get()
 
         if nested == True and existing_session is None:
