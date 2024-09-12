@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+include = ["sqla.extras"]
+
+[project]
+name = "sqla-extras"
+version = "0.0.1"
+authors = [
+  { name="Nirbhay Gupta", email="nirbhay.gupta@junio.in" },
+]
+description = "Falcon Contribution project"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies=[]
+
+[tool.pytest.ini_options]
+addopts = "-rSA"
+testpaths = [
+  "tests"
+]
