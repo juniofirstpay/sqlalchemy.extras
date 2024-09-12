@@ -17,9 +17,7 @@ async_sessionmaker_context: ContextVar[async_sessionmaker] = ContextVar(
 async def _run_callable(
     session: AsyncSession,
     async_callable,
-    auto=True,
     bind=False,
-    nested=None,
     *args,
     **kwargs
 ):
@@ -36,7 +34,7 @@ async def _run_callable(
     return result
 
 
-def with_async_session(async_callable, auto=True, bind=False, nested=False):
+def with_async_session(async_callable, bind=False, nested=False):
     # this function can either be used as an async generator or decorator for transaction or nested transaction
     # for nested transaction, first parameter to the function should be True boolean value
 
@@ -54,7 +52,6 @@ def with_async_session(async_callable, auto=True, bind=False, nested=False):
                 return await _run_callable(
                     existing_session,
                     async_callable,
-                    auto=auto,
                     bind=bind,
                     nested=nested,
                     *args,
@@ -66,7 +63,6 @@ def with_async_session(async_callable, auto=True, bind=False, nested=False):
                 return await _run_callable(
                     existing_session,
                     async_callable,
-                    auto=auto,
                     bind=bind,
                     nested=None,
                     *args,
@@ -78,7 +74,6 @@ def with_async_session(async_callable, auto=True, bind=False, nested=False):
                 return await _run_callable(
                     session,
                     async_callable,
-                    auto=auto,
                     bind=bind,
                     nested=None,
                     *args,
