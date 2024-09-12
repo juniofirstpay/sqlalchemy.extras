@@ -94,7 +94,7 @@ def wrapper(async_callable, auto=True, nested=False):
 def with_async_session(*args, **kwargs):
     # this function can either be used as an async generator or decorator for transaction or nested transaction
     # for nested transaction, first parameter to the function should be True boolean value
-    if inspect.iscoroutinefunction(args[0]):
+    if len(args) == 1 and inspect.iscoroutinefunction(args[0]):
         async_callable = args[0]
         nested = False
         return wrapper(async_callable, auto=True, nested=nested)
