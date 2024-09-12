@@ -17,12 +17,10 @@ async_sessionmaker_context: ContextVar[async_sessionmaker] = ContextVar(
 async def _run_callable(
     session: AsyncSession,
     async_callable,
-    bind=False,
     *args,
     **kwargs
 ):
-    if bind == True:
-        args = (session, *args)
+    args = (session, *args)
 
     result = None
     try:
@@ -33,7 +31,7 @@ async def _run_callable(
 
     return result
 
-def wrapper(async_callable, bind, nested):
+def wrapper(async_callable, auto=True, nested=False):
     session_factory = async_sessionmaker_context.get()
     
     @functools.wraps(async_callable)
@@ -48,33 +46,48 @@ def wrapper(async_callable, bind, nested):
                 return await _run_callable(
                     existing_session,
                     async_callable,
-                    bind=bind,
                     nested=nested,
                     *args,
                     **kwargs
                 )
 
         if nested == False and existing_session:
-            async with existing_session.begin():
+            if auto == False:
                 return await _run_callable(
                     existing_session,
                     async_callable,
-                    bind=bind,
                     nested=None,
                     *args,
                     **kwargs
                 )
+            else:
+                async with existing_session.begin():
+                    return await _run_callable(
+                        existing_session,
+                        async_callable,
+                        nested=None,
+                        *args,
+                        **kwargs
+                    )
 
         async with session_factory() as session:  # type: AsyncSession
-            async with session.begin():
+            if auto == False:
                 return await _run_callable(
                     session,
                     async_callable,
-                    bind=bind,
                     nested=None,
                     *args,
                     **kwargs
                 )
+            else:
+                async with session.begin():
+                    return await _run_callable(
+                        session,
+                        async_callable,
+                        nested=None,
+                        *args,
+                        **kwargs
+                    )
 
     return session_wrapper
 
@@ -83,14 +96,13 @@ def with_async_session(*args, **kwargs):
     # for nested transaction, first parameter to the function should be True boolean value
     if inspect.iscoroutinefunction(args[0]):
         async_callable = args[0]
-        bind = False
         nested = False
-        return wrapper(async_callable, bind, nested)
+        return wrapper(async_callable, auto=True, nested=nested)
     else:
-        bind = kwargs.get("bind", False)
+        auto = kwargs.get("auto", False)
         nested = kwargs.get("nested", False)
         def delayed_wrapper(async_callable):
-            return wrapper(async_callable, bind, nested)
+            return wrapper(async_callable, auto=auto, nested=nested)
         return delayed_wrapper
 
     
