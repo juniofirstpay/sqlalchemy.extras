@@ -17,6 +17,7 @@ async_sessionmaker_context: ContextVar[async_sessionmaker] = ContextVar(
 async def _run_callable(
     session: AsyncSession,
     async_callable,
+    nested=None,
     *args,
     **kwargs
 ):
