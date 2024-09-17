@@ -8,7 +8,7 @@ include = ["sqla.extras"]
 
 [project]
 name = "sqla-extras"
-version = "0.0.9"
+version = "0.0.10"
 authors = [
   { name="Nirbhay Gupta", email="nirbhay.gupta@junio.in" },
 ]

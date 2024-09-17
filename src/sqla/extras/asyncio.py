@@ -58,6 +58,13 @@ def wrapper(async_callable, auto=True, nested=False):
                     *args,
                     **kwargs
                 )
+            elif auto == True and existing_session.is_active:
+                return await _run_callable(
+                    existing_session,
+                    async_callable,
+                    *args,
+                    **kwargs
+                )
             else:
                 async with existing_session.begin():
                     return await _run_callable(
