@@ -75,6 +75,7 @@ def wrapper(async_callable, auto=True, nested=False):
                     )
 
         async with session_factory() as session:  # type: AsyncSession
+            async_session_context.set(session)
             if auto == False:
                 return await _run_callable(
                     session,
