@@ -67,22 +67,31 @@ def wrapper(async_callable, auto=True, nested=False):
                 )
             else:
                 async with existing_session.begin():
-                    return await _run_callable(
-                        existing_session,
-                        async_callable,
-                        *args,
-                        **kwargs
-                    )
+                    try:
+                        result = await _run_callable(
+                            existing_session,
+                            async_callable,
+                            *args,
+                            **kwargs
+                        )
+                        await existing_session.commit()
+                        return result
+                    except Exception as e:
+                        await existing_session.rollback()
+                        raise e
 
         async with session_factory() as session:  # type: AsyncSession
             async_session_context.set(session)
             if auto == False:
-                return await _run_callable(
-                    session,
-                    async_callable,
-                    *args,
-                    **kwargs
-                )
+                try:
+                    return await _run_callable(
+                        session,
+                        async_callable,
+                        *args,
+                        **kwargs
+                    )
+                finally:
+                    async_session_context.set(None)
             else:
                 async with session.begin():
                     try:
@@ -97,6 +106,8 @@ def wrapper(async_callable, auto=True, nested=False):
                     except Exception as e:
                         await session.rollback()
                         raise e
+                    finally:
+                        async_session_context.set(None)
 
     return session_wrapper
 
