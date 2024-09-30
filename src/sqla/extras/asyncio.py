@@ -85,12 +85,18 @@ def wrapper(async_callable, auto=True, nested=False):
                 )
             else:
                 async with session.begin():
-                    return await _run_callable(
-                        session,
-                        async_callable,
-                        *args,
-                        **kwargs
-                    )
+                    try:
+                        result = await _run_callable(
+                            session,
+                            async_callable,
+                            *args,
+                            **kwargs
+                        )
+                        await session.commit()
+                        return result
+                    except Exception as e:
+                        await session.rollback()
+                        raise e
 
     return session_wrapper
 
