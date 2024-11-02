@@ -1,6 +1,7 @@
 pyproject.toml
 src/sqla/extras/__init__.py
 src/sqla/extras/asyncio.py
+src/sqla/extras/asyncio_v2.py
 src/sqla_extras.egg-info/PKG-INFO
 src/sqla_extras.egg-info/SOURCES.txt
 src/sqla_extras.egg-info/dependency_links.txt
