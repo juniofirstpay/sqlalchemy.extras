@@ -1,6 +1,6 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: sqla-extras
-Version: 0.0.14
+Version: 0.0.15
 Summary: Falcon Contribution project
 Author-email: Nirbhay Gupta <nirbhay.gupta@junio.in>
 Classifier: Programming Language :: Python :: 3
@@ -8,3 +8,5 @@ Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
+Requires-Dist: sqlalchemy[asyncio]
+Requires-Dist: structlog
