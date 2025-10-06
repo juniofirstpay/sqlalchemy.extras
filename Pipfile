@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 sqlalchemy = "*"
 build = "*"
+structlog = "*"
 
 [dev-packages]
 black = "*"
